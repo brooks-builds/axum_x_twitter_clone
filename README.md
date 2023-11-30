@@ -27,4 +27,16 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 
 ## Tech
 
-- Axum 0.7.1
+- Axum v0.7.1
+- dotenvy v0.15.7
+- eyre v0.6.9
+- tokio v1.34.0
+  - with features
+    - net
+    - rt-multi-thread
+    - macros
+- tracing v0.1.40
+- tracing-subscriber v0.3.18
+- tower-http v0.5.0
+  - with features
+    - trace
