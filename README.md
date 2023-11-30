@@ -40,3 +40,34 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 - tower-http v0.5.0
   - with features
     - trace
+
+- cli (use `cargo install`)
+  - sqlx-cli v0.7.3
+
+## Setup
+
+1. Create the dotenv file by copying the [.env_example](./.env_example) to .env. On a Unix-like system you can do this with the command `cp .env_example .env`
+  1. Update the environment variables to whatever you want
+
+## Database
+
+A Docker compose file is included to spin up a Postgres database. If you have docker installed run the command `docker compose up -d` to start the database.
+
+### Connecting to the database locally
+
+We can connect to the database directly to check it by running the `psql` command in the docker container.
+
+```sh
+docker compose exec database psql -U postgres
+```
+
+### Models
+
+#### Posts
+
+| PK | FK | Name      | Type         |
+|----|----|-----------|--------------|
+| *  | *  | post_id   | serial       |
+|    |    | text      | varchar(255) |
+|    |    | parent_id | int          |
+|    |    | likes     | int          |
