@@ -5,7 +5,7 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 ## Features
 
 - [ ] Create a post
-  - [ ] limit the characters per post
+  - [x] limit the characters per post
   - [ ] optionally can be response to another post
   - [ ] optionally can be response to response
   - [ ] posts are stored in postgres
@@ -40,6 +40,9 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 - tower-http v0.5.0
   - with features
     - trace
+- serde v1.0.193
+  - with features
+    - derive
 
 - cli (use `cargo install`)
   - sqlx-cli v0.7.3
@@ -65,9 +68,9 @@ docker compose exec database psql -U postgres
 
 #### Posts
 
-| PK | FK | Name      | Type         |
-|----|----|-----------|--------------|
-| *  | *  | post_id   | serial       |
-|    |    | text      | varchar(255) |
-|    |    | parent_id | int          |
-|    |    | likes     | int          |
+| PK | FK | Name      | Type         | Nullable | Default |
+|----|----|-----------|--------------| | |
+| *  | *  | post_id   | serial       | | |
+|    |    | text      | varchar(255) | | |
+|    |    | parent_id | int          | * | |
+|    |    | likes     | int          | | 0 |

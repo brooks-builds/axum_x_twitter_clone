@@ -94,6 +94,7 @@ dependencies = [
  "axum",
  "dotenvy",
  "eyre",
+ "serde",
  "tokio",
  "tower-http",
  "tracing",
