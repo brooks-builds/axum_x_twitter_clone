@@ -10,13 +10,11 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] optionally can be response to response
   - [x] posts are stored in postgres
   - [x] post are validated before storing in database
-- [ ] get a list of all top-level posts
-  - [ ] text
-  - [ ] likes
-  - [ ] paginate
+- [x] get a list of all top-level posts
+  - [x] text
+  - [x] likes
 - [ ] get one post
   - [ ] get immediate responses to the post
-    - [ ] paginate
   - [ ] text
   - [ ] likes
 - [ ] update post
