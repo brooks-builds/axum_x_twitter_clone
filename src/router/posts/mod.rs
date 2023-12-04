@@ -1,9 +1,8 @@
+use crate::state::AppState;
 use axum::{routing::post, Router};
-
-use self::create::create_post;
 
 pub mod create;
 
-pub fn create_posts_router() -> Router {
-    Router::new().route("/", post(create_post))
+pub fn create_posts_router() -> Router<AppState> {
+    Router::new().route("/", post(create::create_post))
 }

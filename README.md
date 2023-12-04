@@ -4,12 +4,12 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 
 ## Features
 
-- [ ] Create a post
+- [x] Create a post
   - [x] limit the characters per post
-  - [ ] optionally can be response to another post
-  - [ ] optionally can be response to response
-  - [ ] posts are stored in postgres
-  - [ ] post are validated before storing in database
+  - [x] optionally can be response to another post
+  - [x] optionally can be response to response
+  - [x] posts are stored in postgres
+  - [x] post are validated before storing in database
 - [ ] get a list of all top-level posts
   - [ ] text
   - [ ] likes
@@ -43,6 +43,10 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
 - serde v1.0.193
   - with features
     - derive
+- sqlx v0.7.3
+  - with features
+    - postgres
+    - runtime-tokio-rustls
 
 - cli (use `cargo install`)
   - sqlx-cli v0.7.3
