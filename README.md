@@ -18,9 +18,8 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] get immediate responses to the post
   - [x] text
   - [x] likes
-- [ ] update post
-  - [ ] text
-  - [ ] undelete
+- [x] update post
+  - [x] text
 - [ ] delete post
   - [ ] soft delete post
 

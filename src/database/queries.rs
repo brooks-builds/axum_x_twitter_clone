@@ -125,3 +125,19 @@ impl TryFrom<Vec<DbPostWithReplies>> for ReplyPost {
         })
     }
 }
+
+pub async fn update_post_text(db: DB, new_text: &str, post_id: i32) -> Result<()> {
+    sqlx::query!(
+        r#"
+            UPDATE posts
+            SET text = $1
+            WHERE post_id = $2;
+        "#,
+        new_text,
+        post_id
+    )
+    .execute(&db)
+    .await?;
+
+    Ok(())
+}
