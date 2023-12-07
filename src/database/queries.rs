@@ -1,10 +1,14 @@
 use super::connect::DB;
-use eyre::Result;
+use eyre::{bail, Result};
 use serde::{Deserialize, Serialize};
 
 pub async fn insert_post(db: DB, text: &str, parent_id: Option<i32>) -> Result<i32> {
     let result = sqlx::query!(
-        "INSERT INTO posts (text, parent_id) VALUES ($1, $2) RETURNING post_id;",
+        r#"
+            INSERT INTO posts (text, parent_id) 
+            SELECT $1, $2 
+            RETURNING post_id;
+        "#,
         text,
         parent_id
     )
@@ -155,4 +159,24 @@ pub async fn soft_delete_post(db: DB, post_id: i32) -> Result<()> {
     .await?;
 
     Ok(())
+}
+
+pub async fn is_post_deleted(db: DB, post_id: i32) -> Result<bool> {
+    let result = sqlx::query!(
+        r#"
+            SELECT COUNT(post_id)
+            FROM posts
+            WHERE post_id = $1
+            AND deleted_at IS NOT NULL;
+        "#,
+        post_id
+    )
+    .fetch_one(&db)
+    .await?;
+
+    let Some(count) = result.count else {
+        bail!("Error checking if post is deleted");
+    };
+
+    Ok(count > 0)
 }

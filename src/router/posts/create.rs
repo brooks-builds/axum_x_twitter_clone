@@ -1,4 +1,7 @@
-use crate::{database::queries::insert_post, state::AppState};
+use crate::{
+    database::queries::{self, insert_post},
+    state::AppState,
+};
 use axum::{
     async_trait,
     extract::{rejection::JsonRejection, FromRequest, Request, State},
@@ -37,14 +40,13 @@ pub struct CreatePost {
 }
 
 #[async_trait]
-impl<S> FromRequest<S> for CreatePost
+impl FromRequest<AppState> for CreatePost
 where
-    Json<CreatePostPartial>: FromRequest<S, Rejection = JsonRejection>,
-    S: Send + Sync,
+    Json<CreatePostPartial>: FromRequest<AppState, Rejection = JsonRejection>,
 {
     type Rejection = Response;
 
-    async fn from_request(request: Request, state: &S) -> Result<Self, Self::Rejection> {
+    async fn from_request(request: Request, state: &AppState) -> Result<Self, Self::Rejection> {
         let Json(post) = Json::<CreatePostPartial>::from_request(request, state)
             .await
             .map_err(|error| {
@@ -75,8 +77,25 @@ where
                 .into_response());
         }
 
-        if post.parent_id.is_some_and(|parent_id| parent_id <= 0) {
-            return Err(StatusCode::BAD_REQUEST.into_response());
+        if let Some(parent_id) = post.parent_id {
+            if parent_id <= 0 {
+                return Err(StatusCode::BAD_REQUEST.into_response());
+            }
+
+            let is_deleted = queries::is_post_deleted(state.db.clone(), parent_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!("Error checking if parent is deleted: {error}");
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "There was a problem creating the new post",
+                    )
+                        .into_response()
+                })?;
+
+            if is_deleted {
+                return Err(StatusCode::NOT_FOUND.into_response());
+            }
         }
 
         Ok(Self {
