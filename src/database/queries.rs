@@ -1,5 +1,4 @@
 use super::connect::DB;
-use dotenvy::Error;
 use eyre::Result;
 use serde::{Deserialize, Serialize};
 
@@ -25,21 +24,52 @@ pub async fn get_all_top_level(db: DB) -> Result<Vec<Post>> {
 }
 
 pub async fn get_one_post(db: DB, post_id: i32) -> Result<Option<ReplyPost>> {
-    let db_post = sqlx::query!(
-            "SELECT p.post_id AS id, p.text, p.likes, p2.text AS reply_text, p2.post_id AS reply_id, p2.likes AS reply_likes, COUNT((SELECT p3.post_id FROM posts p3 WHERE p3.parent_id = p2.post_id)) AS reply_replies FROM posts p LEFT JOIN posts p2 on p2.parent_id = p.post_id WHERE p.post_id = $1 GROUP BY p.post_id, p2.post_id;",
+    let db_post = sqlx::query_as!(
+        DbPostWithReplies,
+        r#"
+                SELECT
+                    post_id AS "id!",
+                    text AS "text!",
+                    likes AS "likes!",
+                    parent_id,
+                    COUNT((SELECT post_id FROM posts WHERE parent_id = $1 LIMIT 1))
+                FROM posts
+                WHERE post_id = $1
+                GROUP BY "id!"
+                UNION
+                SELECT
+                    p.post_id AS "id!",
+                    p.text AS "text!",
+                    p.likes AS "likes!",
+                    p.parent_id,
+                    COUNT((SELECT post_id FROM posts WHERE parent_id = p.post_id))
+                FROM posts p
+                WHERE parent_id = $1
+                GROUP BY "id!"
+                ORDER BY "id!" ASC;
+        "#,
         post_id
-        )
-        .fetch_all(&db)
-        .await?;
+    )
+    .fetch_all(&db)
+    .await?;
 
-    let Some(first) = db_post.first() else {
+    let mut db_posts = db_post.into_iter();
+
+    let Some(first) = db_posts.next() else {
         return Ok(None);
     };
 
     let id = first.id;
     let text = first.text.clone();
     let likes = first.likes;
-    let replies = vec![];
+    let replies = db_posts
+        .map(|db_post| Post {
+            id: db_post.id,
+            text: db_post.text,
+            likes: db_post.likes,
+            replies: db_post.count,
+        })
+        .collect();
 
     Ok(Some(ReplyPost {
         id,
@@ -62,10 +92,8 @@ pub struct DbPostWithReplies {
     id: i32,
     text: String,
     likes: i32,
-    reply_id: Option<i32>,
-    reply_text: Option<String>,
-    reply_likes: Option<i32>,
-    reply_replies: Option<i64>,
+    parent_id: Option<i32>,
+    count: Option<i64>,
 }
 
 #[derive(Serialize, Deserialize)]

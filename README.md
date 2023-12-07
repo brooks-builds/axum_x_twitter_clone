@@ -14,10 +14,8 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] text
   - [x] likes
   - [x] count of immediate children
-- [ ] get one post
-  - [ ] get immediate responses to the post
-    - we need to switch how we are getting posts with responses, current way crashes when we get a post without responses
-    - check out https://www.postgresql.org/docs/16/queries-with.html
+- [x] get one post
+  - [x] get immediate responses to the post
   - [x] text
   - [x] likes
 - [ ] update post
