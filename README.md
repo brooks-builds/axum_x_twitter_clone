@@ -15,7 +15,7 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] text
   - [x] likes
   - [x] count of immediate children
-  - [ ] deleted posts are ignored
+  - [x] deleted posts are ignored
 - [x] get one post
   - [x] get immediate responses to the post
   - [x] text

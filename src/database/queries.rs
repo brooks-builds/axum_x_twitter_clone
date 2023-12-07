@@ -21,7 +21,17 @@ pub async fn insert_post(db: DB, text: &str, parent_id: Option<i32>) -> Result<i
 pub async fn get_all_top_level(db: DB) -> Result<Vec<Post>> {
     Ok(sqlx::query_as!(
         Post,
-        "SELECT p.post_id AS id, p.text, p.likes, COUNT((SELECT p2.post_id FROM posts p2 WHERE p2.parent_id = p.post_id LIMIT 1)) AS replies FROM posts p WHERE p.parent_id is null GROUP BY post_id;"
+        r#"
+            SELECT 
+                p.post_id AS id, 
+                p.text, 
+                p.likes, 
+                COUNT((SELECT p2.post_id FROM posts p2 WHERE p2.parent_id = p.post_id LIMIT 1)) AS replies 
+            FROM posts p 
+            WHERE p.parent_id is null 
+            AND p.deleted_at IS NULL
+            GROUP BY post_id;
+        "#
     )
     .fetch_all(&db)
     .await?)
