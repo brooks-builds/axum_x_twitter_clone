@@ -49,6 +49,7 @@ pub async fn get_one_post(db: DB, post_id: i32) -> Result<Option<ReplyPost>> {
                     COUNT((SELECT post_id FROM posts WHERE parent_id = $1 LIMIT 1))
                 FROM posts
                 WHERE post_id = $1
+                AND deleted_at IS NULL
                 GROUP BY "id!"
                 UNION
                 SELECT
@@ -74,6 +75,11 @@ pub async fn get_one_post(db: DB, post_id: i32) -> Result<Option<ReplyPost>> {
     };
 
     let id = first.id;
+
+    if id != post_id {
+        return Ok(None);
+    }
+
     let text = first.text.clone();
     let likes = first.likes;
     let replies = db_posts

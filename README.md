@@ -20,7 +20,7 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] get immediate responses to the post
   - [x] text
   - [x] likes
-  - [ ] deleted posts respond with a 404
+  - [x] deleted posts respond with a 404
 - [x] update post
   - [x] text
   - [ ] deleted posts respond with a 404
