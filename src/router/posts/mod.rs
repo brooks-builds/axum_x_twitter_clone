@@ -1,11 +1,12 @@
 pub mod create;
+mod delete;
 pub mod get_all_top_level;
 pub mod get_one;
 mod update;
 
 use crate::state::AppState;
 use axum::{
-    routing::{get, patch, post},
+    routing::{delete, get, patch, post},
     Router,
 };
 
@@ -15,4 +16,5 @@ pub fn create_posts_router() -> Router<AppState> {
         .route("/", get(get(get_all_top_level::get_all_top_level)))
         .route("/:id", get(get_one::get_one_post))
         .route("/:id", patch(update::update_post_text))
+        .route("/:id", delete(delete::delete_post))
 }

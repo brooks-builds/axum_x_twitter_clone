@@ -10,18 +10,23 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] optionally can be response to response
   - [x] posts are stored in postgres
   - [x] post are validated before storing in database
+  - [ ] cannot reply to a deleted post
 - [x] get a list of all top-level posts
   - [x] text
   - [x] likes
   - [x] count of immediate children
+  - [ ] deleted posts are ignored
 - [x] get one post
   - [x] get immediate responses to the post
   - [x] text
   - [x] likes
+  - [ ] deleted posts respond with a 404
 - [x] update post
   - [x] text
-- [ ] delete post
-  - [ ] soft delete post
+  - [ ] deleted posts respond with a 404
+- [x] delete post
+  - [x] soft delete post
+  - [ ] deleted posts respond with a 404
 
 ## Tech
 

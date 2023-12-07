@@ -17,7 +17,7 @@ pub async fn insert_post(db: DB, text: &str, parent_id: Option<i32>) -> Result<i
 pub async fn get_all_top_level(db: DB) -> Result<Vec<Post>> {
     Ok(sqlx::query_as!(
         Post,
-        "SELECT p.post_id AS id, p.text, p.likes, COUNT((SELECT p2.post_id FROM posts p2 WHERE p2.parent_id = p.post_id)) AS replies FROM posts p WHERE p.parent_id is null GROUP BY post_id;"
+        "SELECT p.post_id AS id, p.text, p.likes, COUNT((SELECT p2.post_id FROM posts p2 WHERE p2.parent_id = p.post_id LIMIT 1)) AS replies FROM posts p WHERE p.parent_id is null GROUP BY post_id;"
     )
     .fetch_all(&db)
     .await?)
@@ -134,6 +134,21 @@ pub async fn update_post_text(db: DB, new_text: &str, post_id: i32) -> Result<()
             WHERE post_id = $2;
         "#,
         new_text,
+        post_id
+    )
+    .execute(&db)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn soft_delete_post(db: DB, post_id: i32) -> Result<()> {
+    sqlx::query!(
+        r#"
+            UPDATE posts
+            SET deleted_at = NOW()
+            WHERE post_id = $1;
+        "#,
         post_id
     )
     .execute(&db)
