@@ -10,7 +10,6 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] optionally can be response to response
   - [x] posts are stored in postgres
   - [x] post are validated before storing in database
-  - [x] cannot reply to a deleted post
 - [x] get a list of all top-level posts
   - [x] text
   - [x] likes
@@ -23,10 +22,8 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - [x] deleted posts respond with a 404
 - [x] update post
   - [x] text
-  - [ ] deleted posts respond with a 404
 - [x] delete post
   - [x] soft delete post
-  - [ ] deleted posts respond with a 404
 
 ## Tech
 
@@ -81,3 +78,40 @@ docker compose exec database psql -U postgres
 |    |    | text      | varchar(255) | | |
 |    |    | parent_id | int          | * | |
 |    |    | likes     | int          | | 0 |
+
+## Testing
+
+The following are CURL commands to test the API. You can run them in the terminal __if__ you have `curl` installed. Otherwise you might be able to import them into your favorite API testing tool like Postman.
+
+```sh
+## create post
+curl -X "POST" "http://localhost:33498/api/v1/posts" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "text": "I am a new post",
+}'
+## reply to a post
+curl -X "POST" "http://localhost:33498/api/v1/posts" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "text": "I am a reply post",
+  "parent_id": 1
+}'
+
+## get all top level
+curl "http://localhost:33498/api/v1/posts"
+
+## delete post
+curl -X "DELETE" "http://localhost:33498/api/v1/posts/1"
+
+## update
+curl -X "PATCH" "http://localhost:33498/api/v1/posts/4" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "text": "I have been renamed"
+}'
+
+## get one post
+curl "http://localhost:33498/api/v1/posts/15"
+
+```

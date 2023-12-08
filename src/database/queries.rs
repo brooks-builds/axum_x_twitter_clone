@@ -1,5 +1,5 @@
 use super::connect::DB;
-use eyre::{bail, Result};
+use eyre::Result;
 use serde::{Deserialize, Serialize};
 
 pub async fn insert_post(db: DB, text: &str, parent_id: Option<i32>) -> Result<i32> {
@@ -26,7 +26,9 @@ pub async fn get_all_top_level(db: DB) -> Result<Vec<Post>> {
                 p.post_id AS id, 
                 p.text, 
                 p.likes, 
-                COUNT((SELECT p2.post_id FROM posts p2 WHERE p2.parent_id = p.post_id LIMIT 1)) AS replies 
+                (
+                    SELECT COUNT(*) FROM posts p2 WHERE p2.parent_id = p.post_id
+                ) AS replies
             FROM posts p 
             WHERE p.parent_id is null 
             AND p.deleted_at IS NULL
@@ -46,7 +48,7 @@ pub async fn get_one_post(db: DB, post_id: i32) -> Result<Option<ReplyPost>> {
                     text AS "text!",
                     likes AS "likes!",
                     parent_id,
-                    COUNT((SELECT post_id FROM posts WHERE parent_id = $1 LIMIT 1))
+                    (SELECT COUNT(*) FROM posts WHERE parent_id = $1) as count
                 FROM posts
                 WHERE post_id = $1
                 AND deleted_at IS NULL
@@ -57,7 +59,7 @@ pub async fn get_one_post(db: DB, post_id: i32) -> Result<Option<ReplyPost>> {
                     p.text AS "text!",
                     p.likes AS "likes!",
                     p.parent_id,
-                    COUNT((SELECT post_id FROM posts WHERE parent_id = p.post_id))
+                    (SELECT COUNT(*) FROM posts WHERE parent_id = p.post_id) as count
                 FROM posts p
                 WHERE parent_id = $1
                 GROUP BY "id!"
@@ -175,24 +177,4 @@ pub async fn soft_delete_post(db: DB, post_id: i32) -> Result<()> {
     .await?;
 
     Ok(())
-}
-
-pub async fn is_post_deleted(db: DB, post_id: i32) -> Result<bool> {
-    let result = sqlx::query!(
-        r#"
-            SELECT COUNT(post_id)
-            FROM posts
-            WHERE post_id = $1
-            AND deleted_at IS NOT NULL;
-        "#,
-        post_id
-    )
-    .fetch_one(&db)
-    .await?;
-
-    let Some(count) = result.count else {
-        bail!("Error checking if post is deleted");
-    };
-
-    Ok(count > 0)
 }
