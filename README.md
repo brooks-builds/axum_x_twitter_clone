@@ -47,6 +47,9 @@ If we removed everything other than the basics of x/twitter, we have a micro-blo
   - with features
     - postgres
     - runtime-tokio-rustls
+- tower-http v0.5.0
+  - with features
+    - cors
 
 - cli (use `cargo install`)
   - sqlx-cli v0.7.3
